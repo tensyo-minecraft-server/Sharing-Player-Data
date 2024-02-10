@@ -1,0 +1,8 @@
+name: Sharing-Player-Data
+version: '${version}'
+main: moe.nmkmn.sharing_player_data.Main
+api-version: '1.20'
+commands:
+    spd:
+        description: spd
+        permission: sharing_player_data.command.spd

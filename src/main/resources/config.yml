@@ -1,0 +1,9 @@
+database:
+    host: localhost
+    port: 3306
+    user: root
+    password: minecraft
+    database: PlayerData
+    launch_options: "?rewriteBatchedStatements=true&useSSL=false&serverTimezone=UTC"
+    max_connections: 8
+    max_lifetime: 25
