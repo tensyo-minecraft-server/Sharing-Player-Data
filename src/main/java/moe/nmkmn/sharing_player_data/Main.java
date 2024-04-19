@@ -13,6 +13,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -76,20 +77,26 @@ public final class Main extends JavaPlugin {
             throw new RuntimeException(e);
         }
 
-        if (connection != null) {
-            for (OfflinePlayer player : Bukkit.getOfflinePlayers()) {
-                OptionalDouble value = getJecon().getRepository().getDouble(player.getUniqueId());
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (connection != null) {
+                    MoneyDB moneyDB = new MoneyDB();
 
-                if (value.isPresent()) {
-                    try {
-                        MoneyDB moneyDB = new MoneyDB();
-                        moneyDB.getUUIDByDatabase(connection, player.getUniqueId().toString(), value.getAsDouble());
-                    } catch (SQLException e) {
-                        getLogger().severe(e.getMessage());
+                    for (OfflinePlayer player : Bukkit.getOfflinePlayers()) {
+                        OptionalDouble value = getJecon().getRepository().getDouble(player.getUniqueId());
+
+                        if (value.isPresent()) {
+                            try {
+                                moneyDB.getUUIDByDatabase(connection, player.getUniqueId().toString(), value.getAsDouble());
+                            } catch (SQLException e) {
+                                getLogger().severe(e.getMessage());
+                            }
+                        }
                     }
                 }
             }
-        }
+        }.runTaskTimer(this, 0, 5 * 60 * 20L);
     }
 
     public void loadDataSource() {

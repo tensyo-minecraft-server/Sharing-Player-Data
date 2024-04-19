@@ -26,7 +26,7 @@ public class SPDCommand implements CommandExecutor {
     public boolean onCommand(@NotNull CommandSender sender, Command command, @NotNull String label, String[] args) {
         if (command.getName().equalsIgnoreCase("spd")) {
             if (args.length == 0 || args[0].equalsIgnoreCase("help") || args[0].equalsIgnoreCase("?")) {
-                sender.sendMessage("/spd initialize :)");
+                sender.sendMessage("/spd initialize");
             } else {
                 if (args[0].equalsIgnoreCase("initialize")) {
                     Connection connection;
