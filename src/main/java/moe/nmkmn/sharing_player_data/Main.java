@@ -7,6 +7,7 @@ import jp.jyn.jecon.Jecon;
 import moe.nmkmn.sharing_player_data.commands.SPDCommand;
 import moe.nmkmn.sharing_player_data.listeners.PlayerJoinListener;
 import moe.nmkmn.sharing_player_data.listeners.PlayerLeaveListener;
+import moe.nmkmn.sharing_player_data.models.MoneyModel;
 import moe.nmkmn.sharing_player_data.utils.Database;
 import moe.nmkmn.sharing_player_data.utils.MoneyDB;
 import org.bukkit.Bukkit;
@@ -77,21 +78,44 @@ public final class Main extends JavaPlugin {
             throw new RuntimeException(e);
         }
 
+//        if (connection != null) {
+//            MoneyDB moneyDB = new MoneyDB();
+//
+//            for (OfflinePlayer player : Bukkit.getOfflinePlayers()) {
+//                OptionalDouble value = getJecon().getRepository().getDouble(player.getUniqueId());
+//
+//                if (value.isPresent()) {
+//                    try {
+//                        moneyDB.getUUIDByDatabase(connection, player.getUniqueId().toString(), value.getAsDouble());
+//                    } catch (SQLException e) {
+//                        getLogger().severe(e.getMessage());
+//                    }
+//                }
+//            }
+//        }
+
+        // Schedule
         new BukkitRunnable() {
             @Override
             public void run() {
                 if (connection != null) {
                     MoneyDB moneyDB = new MoneyDB();
 
-                    for (OfflinePlayer player : Bukkit.getOfflinePlayers()) {
+                    for (OfflinePlayer player : Bukkit.getOnlinePlayers()) {
                         OptionalDouble value = getJecon().getRepository().getDouble(player.getUniqueId());
 
-                        if (value.isPresent()) {
-                            try {
-                                moneyDB.getUUIDByDatabase(connection, player.getUniqueId().toString(), value.getAsDouble());
-                            } catch (SQLException e) {
-                                getLogger().severe(e.getMessage());
+                        try {
+                            MoneyModel moneyModel = moneyDB.get(connection, player.getUniqueId().toString());
+
+                            if (value.isPresent()) {
+                                if (moneyModel == null) {
+                                    moneyDB.create(connection, new MoneyModel(player.getUniqueId().toString(), value.getAsDouble()));
+                                } else  {
+                                    moneyDB.update(connection, new MoneyModel(player.getUniqueId().toString(), value.getAsDouble()));
+                                }
                             }
+                        } catch (SQLException e) {
+                            throw new RuntimeException(e);
                         }
                     }
                 }
